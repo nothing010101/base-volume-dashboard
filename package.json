@@ -1,0 +1,10 @@
+{
+  "name": "base-volume-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Live dashboard for a Base volume-bot wallet (buy/sell feed + total volume)",
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0e14" />
+    <title>Base Volume Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <div class="brand">
+          <span class="pulse" id="statusDot"></span>
+          <span class="brand-name">BASE VOLUME MONITOR</span>
+        </div>
+        <div class="wallet">
+          <a
+            class="wallet-addr"
+            id="walletAddr"
+            href="#"
+            target="_blank"
+            rel="noreferrer"
+            >—</a
+          >
+          <span class="wallet-bal" id="balance">— ETH</span>
+        </div>
+      </header>
+
+      <section class="hero">
+        <div class="hero-label">TOTAL VOLUME</div>
+        <div class="hero-value">
+          <span id="totalVolume">0.0000</span><span class="unit">ETH</span>
+        </div>
+        <div class="hero-sub">
+          <span id="tradeCount">0</span> trades · <span id="updatedAt">—</span>
+        </div>
+      </section>
+
+      <section class="cards">
+        <div class="card buy">
+          <div class="card-top">
+            <span class="tag buy-tag">BUY</span>
+            <span class="card-count" id="buyCount">0 tx</span>
+          </div>
+          <div class="card-value" id="buyVolume">0.0000</div>
+          <div class="card-unit">ETH</div>
+        </div>
+        <div class="card sell">
+          <div class="card-top">
+            <span class="tag sell-tag">SELL</span>
+            <span class="card-count" id="sellCount">0 tx</span>
+          </div>
+          <div class="card-value" id="sellVolume">0.0000</div>
+          <div class="card-unit">ETH</div>
+        </div>
+      </section>
+
+      <section class="ratio">
+        <div class="ratio-bar">
+          <div class="ratio-buy" id="ratioBuy"></div>
+          <div class="ratio-sell" id="ratioSell"></div>
+        </div>
+        <div class="ratio-legend">
+          <span><i class="dot-buy"></i>Buy</span>
+          <span><i class="dot-sell"></i>Sell</span>
+        </div>
+      </section>
+
+      <section class="feed">
+        <div class="feed-head">
+          <span>LIVE TRADES</span>
+          <span class="muted" id="feedNote"></span>
+        </div>
+        <div class="feed-list" id="feed">
+          <div class="empty">Menunggu data…</div>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span id="lastBlock">Block —</span>
+        <span id="tokenLabel"></span>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
