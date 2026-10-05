@@ -35,15 +35,31 @@ Data is read **directly from the blockchain** (Alchemy), not from the bot — so
 4. Add the environment variables above (Project -> Settings -> Environment Variables).
 5. **Deploy**.
 
-## Local development
+## Run locally / in GitHub Codespaces
 
 ```bash
-npm i -g vercel
 cp .env.example .env      # fill in ALCHEMY_RPC_URL
-vercel dev
+npm start                 # = node server.js
 ```
 
-`vercel dev` serves the static files **and** runs `api/stats.js` locally.
+Open <http://localhost:3000>. No install step, no dependencies.
+
+`server.js` serves the static files **and** runs `api/stats.js` on the same port,
+so it works anywhere Node 18+ runs — including GitHub Codespaces.
+
+### Codespaces: reach it from your phone
+
+1. Start it: `npm start`
+2. Open the **Ports** tab next to the Terminal.
+3. Right-click port **3000** -> *Port Visibility* -> **Public**.
+4. Copy the forwarded `https://<name>-3000.app.github.dev` URL and open it on your phone.
+
+> Codespaces stops when idle (default 30 min) and the URL changes on restart.
+> For an always-on dashboard, deploy to Vercel instead.
+
+## Deploy on Vercel (alternative)
+
+`vercel dev` also works and mirrors production, but needs an interactive login.
 
 ## Notes
 
