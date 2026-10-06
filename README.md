@@ -1,5 +1,5 @@
 # Base Volume Dashboard
-
+-
 Live web dashboard for a Base volume-bot wallet: big **total volume** on the home page, a **BUY / SELL** live feed, and wallet balance.
 
 Data is read **directly from the blockchain** (Alchemy), not from the bot — so it stays accurate even if the bot is offline.
