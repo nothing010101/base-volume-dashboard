@@ -73,14 +73,25 @@ function countBy(list, key) {
   return out;
 }
 
+// alchemy_getAssetTransfers reports ERC20 metadata in `rawContract` (address +
+// decimal) and `asset` (symbol). There is no `erc20Token` field here.
+function tokenInfo(t) {
+  if (t.category !== 'erc20') return null;
+  const addr = t.rawContract && t.rawContract.address
+    ? String(t.rawContract.address).toLowerCase()
+    : null;
+  return { address: addr, symbol: t.asset || null };
+}
+
 function summarize(t) {
+  const info = tokenInfo(t);
   return {
     hash: (t.hash || '').slice(0, 12),
     category: t.category,
-    from: t.from,
-    to: t.to,
     value: t.value,
-    token: t.erc20Token ? t.erc20Token.symbol + ':' + t.erc20Token.address : null,
+    asset: t.asset || null,
+    rawContract: t.rawContract || null,
+    token: info ? info.symbol + ':' + info.address : null,
   };
 }
 
@@ -142,14 +153,13 @@ export default async function handler(req, res) {
 
     for (const t of outgoing) {
       if (!t.hash) continue;
-      const isToken = t.category === 'erc20' && t.erc20Token;
-      const tokenAddr = isToken ? String(t.erc20Token.address).toLowerCase() : null;
-      if (tokenFilter && isToken && tokenAddr !== tokenFilter) continue;
+      const info = tokenInfo(t);
+      if (tokenFilter && info && info.address && info.address !== tokenFilter) continue;
 
       const s = slot(t.hash, metaOf(t));
-      if (isToken) {
+      if (info) {
         s.tokenOut += toNumber(t.value);
-        if (!s.symbol) s.symbol = t.erc20Token.symbol;
+        if (!s.symbol) s.symbol = info.symbol;
       } else if (t.category === 'external') {
         s.ethOut += toNumber(t.value);
       }
@@ -157,14 +167,13 @@ export default async function handler(req, res) {
 
     for (const t of incoming) {
       if (!t.hash) continue;
-      const isToken = t.category === 'erc20' && t.erc20Token;
-      const tokenAddr = isToken ? String(t.erc20Token.address).toLowerCase() : null;
-      if (tokenFilter && isToken && tokenAddr !== tokenFilter) continue;
+      const info = tokenInfo(t);
+      if (tokenFilter && info && info.address && info.address !== tokenFilter) continue;
 
       const s = slot(t.hash, metaOf(t));
-      if (isToken) {
+      if (info) {
         s.tokenIn += toNumber(t.value);
-        if (!s.symbol) s.symbol = t.erc20Token.symbol;
+        if (!s.symbol) s.symbol = info.symbol;
       } else if (t.category === 'external' || t.category === 'internal') {
         s.ethIn += toNumber(t.value);
       }
