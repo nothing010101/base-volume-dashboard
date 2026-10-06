@@ -64,6 +64,26 @@ function metaOf(transfer) {
   return { timestamp, block };
 }
 
+function countBy(list, key) {
+  const out = {};
+  for (const item of list) {
+    const k = item[key] || 'none';
+    out[k] = (out[k] || 0) + 1;
+  }
+  return out;
+}
+
+function summarize(t) {
+  return {
+    hash: (t.hash || '').slice(0, 12),
+    category: t.category,
+    from: t.from,
+    to: t.to,
+    value: t.value,
+    token: t.erc20Token ? t.erc20Token.symbol + ':' + t.erc20Token.address : null,
+  };
+}
+
 export default async function handler(req, res) {
   try {
     if (!getRpcUrl()) {
@@ -73,6 +93,7 @@ export default async function handler(req, res) {
 
     const wallet = (process.env.WALLET_ADDRESS || DEFAULT_WALLET).toLowerCase();
     const tokenFilter = (process.env.TOKEN_ADDRESS || '').toLowerCase();
+    const debug = String(req.url || '').includes('debug=1');
 
     const [incoming, outgoing, balanceHex, blockHex] = await Promise.all([
       fetchTransfers({ direction: 'in', wallet, categories: ['external', 'erc20', 'internal'] }),
@@ -80,6 +101,21 @@ export default async function handler(req, res) {
       rpc('eth_getBalance', [wallet, 'latest']),
       rpc('eth_blockNumber', []),
     ]);
+
+    if (debug) {
+      res.status(200).json({
+        debug: true,
+        wallet,
+        tokenFilter,
+        incomingCount: incoming.length,
+        outgoingCount: outgoing.length,
+        incomingCategories: countBy(incoming, 'category'),
+        outgoingCategories: countBy(outgoing, 'category'),
+        incomingSample: incoming.slice(0, 8).map(summarize),
+        outgoingSample: outgoing.slice(0, 8).map(summarize),
+      });
+      return;
+    }
 
     const txs = new Map();
 
