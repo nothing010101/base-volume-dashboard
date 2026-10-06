@@ -1,20 +1,24 @@
-// Tiny zero-dependency server for GitHub Codespaces / local use.
-// Serves the static dashboard AND runs api/stats.js on the same port.
+// Local / GitHub Codespaces dev server. Zero dependencies.
 //
-//   node server.js        ->  http://localhost:3000
+//   npm start        ->  http://localhost:3000
+//
+// Serves public/ as static files and runs api/stats.js on the same port.
+// This file lives in tools/ so Vercel never mistakes it for an app entrypoint.
 //
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const ROOT = path.dirname(fileURLToPath(import.meta.url));
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const PROJECT = path.resolve(HERE, '..');
+const STATIC_DIR = path.join(PROJECT, 'public');
 const PORT = Number(process.env.PORT) || 3000;
 
 // ---- minimal .env loader (no dependency) ----
 function loadEnv() {
   try {
-    const txt = fs.readFileSync(path.join(ROOT, '.env'), 'utf8');
+    const txt = fs.readFileSync(path.join(PROJECT, '.env'), 'utf8');
     for (const line of txt.split('\n')) {
       const m = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/);
       if (m && !process.env[m[1]]) {
@@ -41,7 +45,7 @@ const MIME = {
 let handlerPromise = null;
 function getHandler() {
   if (!handlerPromise) {
-    const file = pathToFileURL(path.join(ROOT, 'api', 'stats.js')).href;
+    const file = pathToFileURL(path.join(PROJECT, 'api', 'stats.js')).href;
     handlerPromise = import(file).then((m) => m.default);
   }
   return handlerPromise;
@@ -76,11 +80,12 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // ---- static files ----
+  // ---- static files from public/ ----
   const rel = url.pathname === '/' ? '/index.html' : url.pathname;
-  const full = path.join(ROOT, path.normalize(rel).replace(/^(\.\.[/\\])+/, ''));
-  if (!full.startsWith(ROOT)) {
-    res.writeHead(403).end('Forbidden');
+  const full = path.join(STATIC_DIR, path.normalize(rel).replace(/^(\.\.[/\\])+/, ''));
+  if (!full.startsWith(STATIC_DIR)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Forbidden');
     return;
   }
   fs.readFile(full, (err, data) => {

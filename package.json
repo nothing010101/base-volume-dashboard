@@ -8,7 +8,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node tools/dev-server.mjs",
     "dev": "vercel dev"
   }
 }
